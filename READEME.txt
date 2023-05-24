@@ -1,0 +1,13 @@
+# Run Compiler
+
+```
+$ flex tiny.l
+$ bison -d tiny.y
+$ gcc *.c -o Compile && ./Compile SAMPLE.TNY
+```
+
+```
+$ flex cmenos.l
+$ bison -d cmenos.y
+$ gcc *.c -o CompilerWindows && ./CompilerWindows teste.txt
+```

@@ -1,0 +1,35 @@
+/*  Um codigo simples para testar 
+    a criacao do codigo intermediario 
+*/
+
+int gcd (int u, int v[]){
+    return u;
+}
+
+void main(void){
+    int x; 
+    int y[2];
+    x = 1;
+    y[0] = 2;
+    /*x = 3 + 4;
+    x = 5 + 6 + 7;
+    x = 0-1*2;
+    x = x + 1;*/
+    x = y[x*4] + 7;
+    x = y[x/(1+1)] + 7;
+    y[x+1] = 4;
+    if (x == 0) x = x + 1; 
+    else x = x + x;
+
+    while (x <= y[1]){
+        x = x + 1;
+    }
+    x = input();
+
+    y[x*8] = gcd(x, y);
+
+    x = gcd(gcd(x,y),y);
+    gcd(1, y);
+
+    output(y[x-25]);
+}
