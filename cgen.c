@@ -223,10 +223,7 @@ static void genExp(TreeNode *tree)
          break;
       case IGUAL:
          opAux = eq;
-         break;
-      case DIFERENTE:
-         opAux = neq;
-         break;     
+         break;   
       default:
          break;
       }
@@ -461,9 +458,6 @@ void printQuads(){
       case eq:
          printf("EQ,");
          break;
-      case neq:
-         printf("NEQ,");
-         break; 
       case assign:
          printf("ASSIGN,");
          break;

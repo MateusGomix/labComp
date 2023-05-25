@@ -18,8 +18,8 @@ void cGen(TreeNode *);
 
 void codeGen(TreeNode *);
 
-typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,and,or,not,load,store,move,jump,eq,neq,nop,halt,in,out,
-              call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao; //neq não parece ter sido usado
+typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,and,or,not,load,store,move,jump,eq,nop,halt,in,out,
+              call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao; 
 
 typedef enum {Reg,Const,String} TipoEnd;
 

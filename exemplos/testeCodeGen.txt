@@ -2,6 +2,9 @@
     a criacao do codigo intermediario 
 */
 
+int var;
+int vet[10];
+
 int gcd (int u, int v[]){
     return u;
 }

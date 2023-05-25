@@ -3,7 +3,7 @@
 ```
 $ flex tiny.l
 $ bison -d tiny.y
-$ gcc *.c -o Compile && ./Compile SAMPLE.TNY
+$ gcc *.c -o Compiler && ./Compiler SAMPLE.TNY
 ```
 
 ```

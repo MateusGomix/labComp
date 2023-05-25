@@ -1,3 +1,5 @@
+(ALOC,var,global,-)
+(ALOC,vet,10,global)
 (FUN,int,gcd,-)
 (ARG,u,gcd,-)
 (ARG,v,gcd,-)
