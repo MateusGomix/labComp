@@ -19,7 +19,7 @@ void cGen(TreeNode *);
 void codeGen(TreeNode *);
 
 typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,and,or,not,load,store,move,jump,eq,nop,halt,in,out,
-              call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao; 
+              call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao; //move, jump, nop, in, out não usados
 
 typedef enum {Reg,Const,String} TipoEnd;
 

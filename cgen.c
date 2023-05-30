@@ -1,3 +1,7 @@
+/* ideia para controlar os registradores em uso:
+ * liberar os registradores das atribuições, das menções de vetores,
+ * das chamadas de função e parametros
+ */
 
 #include "globals.h"
 #include "symtab.h"
@@ -109,8 +113,10 @@ static void genStmt(TreeNode *tree)
    switch (tree->kind.stmt)
    {
    case RetornoK:
-      cGen(tree->child[0]);
-      endAux1 = globalAux1;
+      if(tree->child[0] != NULL){
+         cGen(tree->child[0]);
+         endAux1 = globalAux1;
+      }
       insereQuad(ret, endAux1, endAux2, endAux3);
       break; /* RetornoK */
    case WhileK:
@@ -231,6 +237,9 @@ static void genExp(TreeNode *tree)
       printf("ENDEREÇO DO REG TEMPORARIO:");
       printEnd(endAux1);
       insereQuad(opAux, endAux1, endAux2, endAux3);
+      int tempReg1 = endAux2->regPos, tempReg2 = endAux3->regPos;
+      if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
+      if(tempReg2 >= 0 && isRegUsed[tempReg2]) isRegUsed[tempReg2] = 0;
       /* ideia para controlar os registradores em uso: liberar os registradores temporarios 
        * endAux2 e endAux3 se forem regs temps
        */
