@@ -56,14 +56,15 @@ int main( int argc, char * argv[] )
 #if NO_PARSE
   while (getToken()!=ENDFILE);
 #else
+  fprintf(listing,"\nTokens e lexemas:\n");
   syntaxTree = parse();
   if (TraceParse && !Error) {
     fprintf(listing,"\nArvore Sintatica:\n");
     printTree(syntaxTree);
   }
-  printf("saiu da arvore\n");
+  //printf("saiu da arvore\n");
   salvaEscopo(syntaxTree);
-  printf("saiu do salva escopo\n");
+  //printf("saiu do salva escopo\n");
   // ERRO 6
   if(qtdMain == 0 && !Error){
     Error = 1;
@@ -73,15 +74,15 @@ int main( int argc, char * argv[] )
   if (! Error)
   { 
     typeCheck(syntaxTree);
-    printf("saiu do typecheck\n");
+    //printf("saiu do typecheck\n");
     buildSymtab(syntaxTree);
-    printf("saiu do buildsymtab\n");
+    //printf("saiu do buildsymtab\n");
   }
 
 #if !NO_CODE
   if (! Error)
   {
-    fprintf(listing,"\nCODIGO INTERMEDIARIO\n");
+    fprintf(listing,"\nCodigo intermediario:\n");
     
     codeGen(syntaxTree);
   }

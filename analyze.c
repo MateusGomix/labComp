@@ -312,7 +312,7 @@ static void erroSemantico(TreeNode * t)
           // Verificando os argumentos de uma função: 
           // quantidade, tipo(int) e ponteiros 
           if(!strcmp(t->tipoID,"fun")){
-            printf("entrou na condicao de verificar argumentos de funcao\n");
+            //printf("entrou na condicao de verificar argumentos de funcao\n");
 
             int auxArgs = 0;
             for(TreeNode *aux = t->child[0]; aux != NULL; aux = aux->sibling){
@@ -326,7 +326,7 @@ static void erroSemantico(TreeNode * t)
               }
             }
 
-            printf("saiu do primeiro for\n");
+            //printf("saiu do primeiro for\n");
 
             if(auxArgs != t->qtdArgumentos){
 
@@ -335,7 +335,7 @@ static void erroSemantico(TreeNode * t)
 
             }
 
-            printf("saiu do if de qtd\n");
+            //printf("saiu do if de qtd\n");
 
             // Verificando se os parâmetros vetores e não vetores batem batem 
             if(t->qtdArgumentos > 0){
@@ -386,14 +386,14 @@ static void erroSemantico(TreeNode * t)
                       fprintf(listing,"ERRO SEMANTICO: %s LINHA: %d\n",ativAux->attr.name,ativAux->lineno);
                       break;
                   }
-                  printf("indo para os irmaos\n");
+                  //printf("indo para os irmaos\n");
                   declAux = declAux->sibling;
                   ativAux = ativAux->sibling;
-                  printf("fim do while de tipo\n");
+                  //printf("fim do while de tipo\n");
                 }
               }
             }
-            printf("saiu da condicao de verificar argumentos de funcao\n");
+            //printf("saiu da condicao de verificar argumentos de funcao\n");
           }
 
           break;
@@ -531,7 +531,7 @@ static void erroSemantico(TreeNode * t)
 void verificaTipo(TreeNode * syntaxTree)
 { 
   traverse(syntaxTree,erroSemantico,nullProc);
-  printf("saiu do traverse do verificaTipo\n");
+  //printf("saiu do traverse do verificaTipo\n");
 }
 
 /* Function buildSymtab constructs the symbol 
@@ -539,13 +539,13 @@ void verificaTipo(TreeNode * syntaxTree)
  */
 void buildSymtab(TreeNode * syntaxTree)
 { traverse(syntaxTree,insertNode,nullProc);
-  printf("saiu do traverse\n");
+  //printf("saiu do traverse\n");
   
   verificaTipo(syntaxTree);
-  printf("saiu do verificaTipo\n");
+  //printf("saiu do verificaTipo\n");
 
   if (TraceAnalyze && !Error)
-  { fprintf(listing,"\nTabela de Simbolos:\n\n");
+  { fprintf(listing,"\nTabela de Simbolos:\n");
     printSymTab(listing);
   }
 }

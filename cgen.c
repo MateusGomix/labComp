@@ -56,9 +56,9 @@ Endereco *novoTemp(){
    sprintf(regName, "t_%d", regVal);
    //snprintf(regName, sizeof(regName), "t_%d", tempRegsCount++);
 
-   printf("NUMERO DO REG: %d %s\n", regVal, regName);
+   //printf("NUMERO DO REG: %d %s\n", regVal, regName);
    Endereco *returnReg = criaEnd(String, regName, -1);
-   printEnd(returnReg);
+   //printEnd(returnReg);
    returnReg->regPos = regVal;
    return returnReg;
 }
@@ -69,9 +69,9 @@ Endereco *novoLabel(){
    sprintf(labelName, "L%d", labelsCount++);
    //snprintf(regName, sizeof(labelName), "t_%d", labelsCount++);
 
-   printf("NUMERO DO REG: %d %s\n", labelsCount, labelName);
+   //printf("NUMERO DO REG: %d %s\n", labelsCount, labelName);
    Endereco *returnReg = criaEnd(String, labelName, -1);
-   printEnd(returnReg);
+   //printEnd(returnReg);
    return returnReg;
 }
 
@@ -187,17 +187,17 @@ static void genExp(TreeNode *tree)
    switch (tree->kind.exp)
    {
    case OpK:
-      printf("entrou no opk\n");
+      //printf("entrou no opk\n");
       cGen(tree->child[0]);
-      printf("opk\n");
+      //printf("opk\n");
       endAux2 = globalAux1;
       cGen(tree->child[1]);
-      printf("opk\n");
+      //printf("opk\n");
       endAux3 = globalAux1;
       endAux1 = novoTemp();
-      printEnd(endAux1);
-      if(endAux1->tipo == String) printf("ELE TEM TIPO");
-      printf("opk\n");
+      //printEnd(endAux1);
+      //if(endAux1->tipo == String) printf("ELE TEM TIPO");
+      //printf("opk\n");
       //cria temporario
       //converte tipo
       Operacao opAux;
@@ -233,9 +233,9 @@ static void genExp(TreeNode *tree)
       default:
          break;
       }
-      printf("opk\n");
-      printf("ENDEREÇO DO REG TEMPORARIO:");
-      printEnd(endAux1);
+      //printf("opk\n");
+      //printf("ENDEREÇO DO REG TEMPORARIO:");
+      //printEnd(endAux1);
       insereQuad(opAux, endAux1, endAux2, endAux3);
       int tempReg1 = endAux2->regPos, tempReg2 = endAux3->regPos;
       if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
@@ -245,14 +245,14 @@ static void genExp(TreeNode *tree)
        */
       globalAux1 = endAux1;
       globalAux2 = NULL;
-      printf("opk\n");
+      //printf("opk\n");
 
       break; /* OpK */
 
    case ConstK:
-      printf("entrou no constk\n");
+      //printf("entrou no constk\n");
       globalAux1 = criaEnd(Const, NULL, tree->attr.val);
-      printf("constk\n");
+      //printf("constk\n");
       globalAux2 = NULL;
       break; /* ConstK */
 
@@ -510,12 +510,12 @@ void printQuads(){
 void codeGen(TreeNode *syntaxTree)
 {
    /* generate code for Cmenos program */
-   printf("a\n");
+   //printf("a\n");
    cGen(syntaxTree);
    /* finish */
-   printf("b\n");
+   //printf("b\n");
    insereQuad(halt, NULL, NULL, NULL);
-   printf("c\n");
+   //printf("c\n");
    printQuads();
-   printf("d\n");
+   //printf("d\n");
 }
