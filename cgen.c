@@ -94,6 +94,22 @@ Quad insereQuad(Operacao op, Endereco *end1, Endereco *end2, Endereco *end3)
 
       auxNode->next = newNode;
    }
+   //printf("entrou no if abaixo");
+   /* Liberando espaço do vetor de regs ERRO AQUI*/
+   if (end1 != NULL && (op == ret || op == iffalse)){
+      int tempReg1 = end1->regPos;
+      if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
+   }
+   if (end2 != NULL){
+      int tempReg2 = end2->regPos;
+      if(tempReg2 >= 0 && isRegUsed[tempReg2]) isRegUsed[tempReg2] = 0;
+   }
+   //printf("saiu do if acima");
+   if (end3 != NULL){
+      int tempReg3 = end3->regPos;
+      if(tempReg3 >= 0 && isRegUsed[tempReg3]) isRegUsed[tempReg3] = 0;
+   }
+   //printQuads();
 }
 
 /* tmpOffset is the memory offset for temps
@@ -118,6 +134,17 @@ static void genStmt(TreeNode *tree)
          endAux1 = globalAux1;
       }
       insereQuad(ret, endAux1, endAux2, endAux3);
+      /*
+      if (endAux1 != NULL){
+         int tempReg1 = endAux1->regPos;
+         //printf("%d", tempReg1);
+         //printf("%d", isRegUsed[tempReg1]);
+         
+         if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
+
+         //printf("saiu do if do retornok");
+      }*/
+
       break; /* RetornoK */
    case WhileK:
       {Endereco *labelWhileStart = novoLabel(), *labelWhileEnd = novoLabel();
@@ -175,6 +202,13 @@ static void genStmt(TreeNode *tree)
       //printf("aqui");
       insereQuad(store, endAux1, endAux2, endAux3);
       //printf("aqui");
+
+      /*int tempReg1 = endAux2->regPos;
+      if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
+      if (endAux3 != NULL){
+         int tempReg2 = endAux3->regPos;
+         if(tempReg2 >= 0 && isRegUsed[tempReg2]) isRegUsed[tempReg2] = 0;
+      }*/
 
       break; /* RecebeK */
    }
@@ -237,9 +271,12 @@ static void genExp(TreeNode *tree)
       //printf("ENDEREÇO DO REG TEMPORARIO:");
       //printEnd(endAux1);
       insereQuad(opAux, endAux1, endAux2, endAux3);
-      int tempReg1 = endAux2->regPos, tempReg2 = endAux3->regPos;
+      /*int tempReg1 = endAux2->regPos;
       if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
-      if(tempReg2 >= 0 && isRegUsed[tempReg2]) isRegUsed[tempReg2] = 0;
+      if (endAux3 != NULL){
+         int tempReg2 = endAux3->regPos;
+         if(tempReg2 >= 0 && isRegUsed[tempReg2]) isRegUsed[tempReg2] = 0;
+      }*/
       /* ideia para controlar os registradores em uso: liberar os registradores temporarios 
        * endAux2 e endAux3 se forem regs temps
        */
@@ -318,12 +355,18 @@ static void genExp(TreeNode *tree)
                   endAux3 = criaEnd(Const, NULL, INT_MEM_BYTES);
                   insereQuad(mult, endAux1, endAux2, endAux3);
 
+                  //int tempReg1 = endAux2->regPos;
+                  //if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
+
                   endAux3 = endAux1;
                }
                endAux1 = novoTemp();
                endAux2 = criaEnd(String, tree->attr.name, -1);
                
                insereQuad(load, endAux1, endAux2, endAux3);
+
+               //if(tempReg1 >= 0 && isRegUsed[tempReg1]) isRegUsed[tempReg1] = 0;
+
                globalAux1 = endAux1;
                globalAux2 = NULL;
             }
