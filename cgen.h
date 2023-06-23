@@ -10,6 +10,8 @@
 
 #include "cgen.h"
 
+#define TOTAL_REGS 30
+
 /* Procedure codeGen generates code to a code
  * file by traversal of the syntax tree. The
  * second parameter (codefile) is the file name
@@ -20,8 +22,8 @@ void cGen(TreeNode *);
 
 
 
-typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,and,or,not,load,store,move,jump,eq,nop,halt,
-              call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao; //move, jump, nop, in, out não usados
+typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,and,or,not,load,store,eq,halt,
+              call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao;
 
 typedef enum {Reg,Const,String} TipoEnd;
 
@@ -38,6 +40,7 @@ typedef struct ListaQuadItem{
     //int location;
     Operacao op;
     Endereco *end1, *end2, *end3;
+    int regsUsados[TOTAL_REGS];
     struct ListaQuadItem *next;
 }Quad;
 

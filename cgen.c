@@ -12,7 +12,6 @@
 
 #define STRING_TAM 10
 #define INT_MEM_BYTES 32
-#define TOTAL_REGS 50
 
 int isRegUsed[TOTAL_REGS] = {0};
 
@@ -84,6 +83,10 @@ Quad insereQuad(Operacao op, Endereco *end1, Endereco *end2, Endereco *end3)
    newNode->end3 = end3;
    newNode->next = NULL;
 
+   for (int i = 0; i < TOTAL_REGS; i++){
+      newNode->regsUsados[i] = isRegUsed[i];
+   }
+
    if (raizLista == NULL)
       raizLista = newNode;
    else
@@ -94,6 +97,7 @@ Quad insereQuad(Operacao op, Endereco *end1, Endereco *end2, Endereco *end3)
 
       auxNode->next = newNode;
    }
+
    //printf("entrou no if abaixo");
    /* Liberando espaço do vetor de regs ERRO AQUI*/
    if (end1 != NULL && (op == ret || op == iffalse)){
