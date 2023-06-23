@@ -550,7 +550,7 @@ void printQuads(){
  * of the code file, and is used to print the
  * file name as a comment in the code file
  */
-void codeGen(TreeNode *syntaxTree)
+rStruct* codeGen(TreeNode *syntaxTree)
 {
    /* generate code for Cmenos program */
    //printf("a\n");
@@ -561,4 +561,8 @@ void codeGen(TreeNode *syntaxTree)
    //printf("c\n");
    printQuads();
    //printf("d\n");
+   rStruct *retornoAux = (rStruct *) malloc(sizeof(rStruct));
+   retornoAux->raiz = raizLista;
+   retornoAux->regs = isRegUsed;
+   return retornoAux;
 }

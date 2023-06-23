@@ -12,12 +12,17 @@
 /* Se NO_CODE TRUE apenas análise semântica */
 #define NO_CODE FALSE
 
+#define NO_ASSEMBLY FALSE
+
 #include "util.h"
 
 #if !NO_ANALYZE
 #include "analyze.h"
 #if !NO_CODE
 #include "cgen.h"
+#endif
+#if !NO_ASSEMBLY
+#include "agen.h"
 #endif
 #endif
 
@@ -38,6 +43,7 @@ int Error = FALSE;
 
 int main( int argc, char * argv[] )
 { TreeNode * syntaxTree;
+rStruct * quadAux;
   char pgm[120]; /* source code file name */
   if (argc != 2)
     { fprintf(stderr,"usage: %s <filename>\n",argv[0]);
@@ -84,7 +90,15 @@ int main( int argc, char * argv[] )
   {
     fprintf(listing,"\nCodigo intermediario:\n");
     
-    codeGen(syntaxTree);
+    quadAux = codeGen(syntaxTree);
+  }
+#endif
+#if !NO_ASSEMBLY  
+  if (! Error)
+  {
+    fprintf(listing,"\nCodigo assembly:\n");
+    
+    assemblyGen(quadAux);
   }
 #endif
 #endif
