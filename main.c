@@ -96,7 +96,7 @@ rStruct * quadAux;
 #if !NO_ASSEMBLY  
   if (! Error)
   {
-    fprintf(listing,"\nCodigo assembly:\n");
+    fprintf(listing,"\nCriacao do codigo assembly:\n");
     
     assemblyGen(quadAux);
   }

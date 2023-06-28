@@ -20,9 +20,7 @@
  */
 void cGen(TreeNode *);
 
-
-
-typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,and,or,not,load,store,eq,halt,
+typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,load,store,eq,halt,
               call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao;
 
 typedef enum {Reg,Const,String} TipoEnd;
@@ -34,6 +32,7 @@ typedef struct{
         char *nome;
     }conteudo;
     int regPos;
+    int label;
 } Endereco;
 
 typedef struct ListaQuadItem{
@@ -43,6 +42,8 @@ typedef struct ListaQuadItem{
     int regsUsados[TOTAL_REGS];
     struct ListaQuadItem *next;
 }Quad;
+
+void printQuad(Quad *);
 
 typedef struct retornoStruct{
     Quad *raiz;

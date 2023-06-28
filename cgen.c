@@ -64,12 +64,14 @@ Endereco *novoTemp(){
 
 Endereco *novoLabel(){
    char *labelName = malloc(STRING_TAM);
+   int labelAux = labelsCount;
 
    sprintf(labelName, "L%d", labelsCount++);
    //snprintf(regName, sizeof(labelName), "t_%d", labelsCount++);
 
    //printf("NUMERO DO REG: %d %s\n", labelsCount, labelName);
    Endereco *returnReg = criaEnd(String, labelName, -1);
+   returnReg->label = labelAux;
    //printEnd(returnReg);
    return returnReg;
 }
@@ -452,11 +454,8 @@ void printEnd(Endereco *endAux)
    }
 }
 
-void printQuads(){
-   Quad *aux = raizLista;
-   while (aux != NULL)
-   {
-      printf("(");
+void printQuad(Quad *aux){
+   printf("(");
 
       switch (aux->op)
       {
@@ -541,6 +540,13 @@ void printQuads(){
       printEnd(aux->end3);
 
       printf(")\n");
+}
+
+void printQuads(){
+   Quad *aux = raizLista;
+   while (aux != NULL)
+   {
+      printQuad(aux);
       aux = aux->next;
    }
 }

@@ -10,6 +10,7 @@
 
 #include "cgen.h"
 
+/* add uma propriedade arg para verificar se é necessário usar endereço de memória de vetor */
 typedef struct VarListRec
    { int memloc;
      int tam;
