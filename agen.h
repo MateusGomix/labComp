@@ -10,6 +10,8 @@
 
 #include "cgen.h"
 
+#define TOTAL_REGS 29
+
 /* add uma propriedade arg para verificar se é necessário usar endereço de memória de vetor */
 typedef struct VarListRec
    { int memloc;
@@ -51,5 +53,24 @@ typedef struct instrucaoAssembly{
     int line;
     struct instrucaoAssembly *next;
 }instA;
+
+/* TENTANDO FAZER MINHA PILHA */
+typedef struct ItemReg{
+	int *regsEmpilhados;
+	struct ItemReg *prox;
+} TItemReg;
+
+typedef struct PilhaReg {
+  int tam;
+  struct ItemReg *topo;
+} TPilhaReg;
+
+TPilhaReg* criaPilhaReg();
+
+TItemReg* criaItemReg(int*);
+
+void addPilhaReg(TPilhaReg*, int*);
+
+int* popPilhaReg(TPilhaReg*);
 
 #endif

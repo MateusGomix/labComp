@@ -4,7 +4,6 @@
  */
 
 #include "globals.h"
-#include "util.h"
 #include "symtab.h"
 #include "code.h"
 #include "agen.h"
@@ -12,17 +11,54 @@
 #include "stdlib.h"
 
 #define STRING_TAM 10
-#define INT_MEM_BYTES 32
+#define REG_PILHA 29
 #define REG_FRAME 30
+#define REG_RA 31
 #define FRAME_SIZE 32
 //#define TOTAL_MEM 64
 
 //int isMemUsed[TOTAL_MEM] = {0};
 
 int currLineno = 0;
-char *currEscopo = NULL;
+/*talvez esse currEscopo de problema*/
+char *currEscopo = "global";
 
 instA *raizListaA = NULL;
+
+
+TPilhaReg* criaPilhaReg(){
+  TPilhaReg *pilha = (TPilhaReg*) malloc(sizeof(TPilhaReg));
+  pilha->tam = 0;
+  pilha->topo = NULL;
+  return pilha;
+}
+
+TItemReg* criaItemReg(int *elem){
+  TItemReg *item = (TItemReg*) malloc(sizeof(TItemReg));
+  item->regsEmpilhados = elem;
+  item->prox = NULL;
+  return item;
+}
+
+void addPilhaReg(TPilhaReg *pilha, int *elem){
+  TItemReg *aux = criaItemReg(elem);
+  
+  if(pilha->tam == 0){
+    pilha->topo = aux;
+  }
+  else{
+    aux->prox = pilha->topo;
+    pilha->topo = aux;
+  }
+  pilha->tam += 1;
+}
+
+int* popPilhaReg(TPilhaReg *pilha){
+  TItemReg *aux = pilha->topo;
+  pilha->topo = aux->prox;
+  pilha->tam -= 1;
+  return aux->regsEmpilhados;
+}
 
 /* SIZE is the size of the hash table */
 #define SIZE 211
@@ -86,6 +122,7 @@ void insereHash(char *nome, char *escopo, int tam){
     
     if (l == NULL){ /* variable not yet in table */
         l = (BucketList) malloc(sizeof(struct BucketListRec));
+        // onde começa cada escopo/funcao, global não tem um inicio pois nao é funcao
         if (strcmp(busca,"global") != 0) l->lineno = currLineno;
         else l->lineno = -1;
         l->name = escopo;
@@ -147,6 +184,41 @@ void aGen(Quad *currQuad){
         printQuad(currQuad);
         switch (currQuad->op)
         {
+        case param:
+        {
+
+            break;
+        }
+        case call:
+        {
+            // call de input
+            if(strcmp(currQuad->end2->conteudo.nome, "input") == 0){
+                if (currQuad->next->op == store){
+                    //printf("ENTROU AQUI AAAAAAAA");
+                    int imAux = 0;
+                    int regAux1;
+                    instA *auxPrintA2;
+
+                    // posicao da memoria da variavel
+                    regAux1 = buscaRegLivreA(currQuad->next->regsUsados);
+                    currQuad->next->regsUsados[regAux1] = 1;
+                    VarList varListAux = buscaHash(currEscopo, currQuad->next->end1->conteudo.nome);
+                    auxPrintA = insereAssembly(tipoI, multiA, REG_FRAME, regAux1, -1, FRAME_SIZE);
+                    insereAssembly(tipoI, addiA, regAux1, regAux1, -1, varListAux->memloc);
+
+                    if (currQuad->next->end3 != NULL){
+                        if(currQuad->next->end3->regPos < 0) insereAssembly(tipoI, addiA, regAux1, regAux1, -1, currQuad->next->end3->conteudo.val);
+                        else insereAssembly(tipoR, addA, regAux1, currQuad->next->end3->regPos, regAux1, -1);
+                    }
+
+                    insereAssembly(tipoI, inA, regAux1, -1, -1, imAux);
+                    // pulando o próximo store
+                    currQuad = currQuad->next;
+                }
+            }
+            break;
+        }
+
         case gotolab:
         {
             auxPrintA = insereAssembly(tipoJ, jA, -1, -1, -1, currQuad->next->end1->label);
@@ -347,7 +419,10 @@ void aGen(Quad *currQuad){
             {
                 //printf("entrou no fun\n");
                 char *escopo = currQuad->end2->conteudo.nome;
+                //PRINTANDO OS ESCOPOS AQUI 
+                printf(currEscopo);
                 currEscopo = escopo;
+                printf(currEscopo);
                 if (!strcmp(escopo, "main")) {
                     auxPrintA = insereAssembly(tipoI, loadiA, -1, REG_FRAME, -1, 0);
                     insereAssembly(tipoI, addiA, REG_FRAME, REG_FRAME, -1, 1);
@@ -382,6 +457,9 @@ void printAssembly(instA *aux){
    {
       switch (aux->opA)
       {
+      case inA:
+        printf("in");
+        break;
       case sltA:
         printf("slt");
         break;

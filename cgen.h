@@ -10,7 +10,7 @@
 
 #include "cgen.h"
 
-#define TOTAL_REGS 30
+#define TOTAL_REGS 29
 
 /* Procedure codeGen generates code to a code
  * file by traversal of the syntax tree. The
