@@ -17,6 +17,7 @@ typedef struct VarListRec
    { int memloc;
      int tam;
      char *name;
+     int isVetArg;
      struct VarListRec * next;
    } * VarList;
 

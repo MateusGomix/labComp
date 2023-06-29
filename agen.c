@@ -111,7 +111,7 @@ instA* insereAssembly(TipoA tipo, OperacaoA op, int rs, int rt, int rd, int im)
    return newNode;
 }
 
-void insereHash(char *nome, char *escopo, int tam){
+void insereHash(char *nome, char *escopo, int tam, int isVetArg){
     char * busca = (char *) malloc(sizeof(char));
     strcpy(busca,escopo);
     //if (nome != NULL) strcat(busca,nome);
@@ -120,7 +120,7 @@ void insereHash(char *nome, char *escopo, int tam){
     while ((l != NULL) && (strcmp(busca,l->name) != 0))
         l = l->next;
     
-    if (l == NULL){ /* variable not yet in table */
+    if (l == NULL){ /* escopo not yet in table */
         l = (BucketList) malloc(sizeof(struct BucketListRec));
         // onde começa cada escopo/funcao, global não tem um inicio pois nao é funcao
         if (strcmp(busca,"global") != 0) l->lineno = currLineno;
@@ -132,12 +132,14 @@ void insereHash(char *nome, char *escopo, int tam){
             l->vars->memloc = 0;
             l->vars->tam = tam;
             l->vars->name = nome;
+            l->vars->isVetArg = isVetArg;
             l->vars->next = NULL;
         }
         //l->calling = -1;
         l->next = hashTable[h];
         hashTable[h] = l; 
     }
+    // escopo existe, add mais uma variável àquele escopo
     else{
         VarList t = l->vars;
         if (t == NULL){
@@ -145,6 +147,7 @@ void insereHash(char *nome, char *escopo, int tam){
             l->vars->memloc = 0;
             l->vars->tam = tam;
             l->vars->name = nome;
+            l->vars->isVetArg = isVetArg;
             l->vars->next = NULL;
         }
         else{
@@ -152,6 +155,7 @@ void insereHash(char *nome, char *escopo, int tam){
             t->next = (VarList) malloc(sizeof(struct VarListRec));
             t->next->memloc = t->memloc + t->tam;
             t->next->name = nome;
+            t->next->isVetArg = isVetArg;
             t->next->next = NULL;
         }
     }
@@ -178,15 +182,58 @@ VarList buscaHash(char *escopo, char *nome){
 }
 
 instA *auxPrintA;
+int paramCont = 0;
 
 void aGen(Quad *currQuad){
     if (currQuad != NULL){
         printQuad(currQuad);
         switch (currQuad->op)
         {
+        case arg: /* PAREI AQUI AAAAAAAAAAAAAAAAAAAAAAAA */
+        {
+          //printf("entru aquiiii");
+          insereHash(currQuad->end1->conteudo.nome, currQuad->end2->conteudo.nome, 1, 1);
+
+          int regAux1 = buscaRegLivreA(currQuad->next->regsUsados);
+          currQuad->next->regsUsados[regAux1] = 1;
+          // início do frame 2x posterior, ou final do próximo frame em regAux1
+          auxPrintA = insereAssembly(tipoI, addiA, REG_FRAME, regAux1, -1, 1);
+          insereAssembly(tipoI, multiA, regAux1, regAux1, -1, FRAME_SIZE);
+          insereAssembly(tipoR, subA, regAux1, REG_PILHA, regAux1, paramCont);
+
+          int regAux2 = buscaRegLivreA(currQuad->next->regsUsados);
+          currQuad->next->regsUsados[regAux2] = 1;
+          insereAssembly(tipoI, loadA, regAux1, regAux2, -1, 0);
+
+          VarList varListAux = buscaHash(currEscopo, currQuad->end1->conteudo.nome);
+          insereAssembly(tipoI, multiA, REG_FRAME, regAux1, -1, FRAME_SIZE);
+          insereAssembly(tipoI, addiA, regAux1, regAux1, -1, varListAux->memloc);
+          insereAssembly(tipoI, storeA, regAux1, regAux2, -1, 0);
+
+          break;
+        }
         case param:
         {
-            
+            paramCont++;
+            int regAux2 = currQuad->end1->regPos;
+            instA *auxPrintA2;
+            if(regAux2 < 0){
+                regAux2 = buscaRegLivreA(currQuad->regsUsados);
+                currQuad->regsUsados[regAux2] = 1;
+                auxPrintA2 = insereAssembly(tipoI, loadiA, -1, regAux2, -1, currQuad->end1->conteudo.val);
+            }
+
+            int regAux1 = buscaRegLivreA(currQuad->next->regsUsados);
+            currQuad->next->regsUsados[regAux1] = 1;
+            // início do frame 2x posterior, ou final do próximo frame em regAux1
+            auxPrintA = insereAssembly(tipoI, addiA, REG_FRAME, regAux1, -1, 2);
+            insereAssembly(tipoI, multiA, regAux1, regAux1, -1, FRAME_SIZE);
+            insereAssembly(tipoI, subiA, regAux1, regAux1, -1, paramCont);
+
+            insereAssembly(tipoI, storeA, regAux2, regAux1, -1, 0);
+
+            if(currQuad->end1->regPos < 0) auxPrintA = auxPrintA2;
+
             break;
         }
         case call:
@@ -408,9 +455,9 @@ void aGen(Quad *currQuad){
         {
             /* variavel comum (nao vetor) */
             if (currQuad->end3 == NULL){
-                insereHash(currQuad->end1->conteudo.nome, currQuad->end2->conteudo.nome, 1);
+                insereHash(currQuad->end1->conteudo.nome, currQuad->end2->conteudo.nome, 1, 0);
             }
-            else insereHash(currQuad->end1->conteudo.nome, currQuad->end3->conteudo.nome, currQuad->end2->conteudo.val);
+            else insereHash(currQuad->end1->conteudo.nome, currQuad->end3->conteudo.nome, currQuad->end2->conteudo.val, 0);
             auxPrintA = NULL;
             break;
         }
@@ -429,7 +476,7 @@ void aGen(Quad *currQuad){
                 }
                 else auxPrintA = insereAssembly(tipoI, addiA, REG_FRAME, REG_FRAME, -1, 1);
                 
-                insereHash(NULL, escopo, 0);
+                insereHash(NULL, escopo, 0, 0);
                 
                 //printf("saiu do fun\n");
                 break; /* end fun*/

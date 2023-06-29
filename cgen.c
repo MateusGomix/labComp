@@ -347,6 +347,7 @@ static void genExp(TreeNode *tree, TreeNode *parent)
             if(!tree->isArg) insereQuad(aloc, endAux1, endAux2, endAux3);
             else {
                if(parent->sibling != NULL) genExp(parent->sibling->child[0], parent->sibling);
+               if (tree->vetor) endAux3 = criaEnd(String, "vet", -1); //indicar que esse param é um vetor
                insereQuad(arg, endAux1, endAux2, endAux3);
             }
             //printf("b");
