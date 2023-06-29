@@ -12,7 +12,7 @@
 /* Se NO_CODE TRUE apenas análise semântica */
 #define NO_CODE FALSE
 
-#define NO_ASSEMBLY FALSE
+#define NO_ASSEMBLY TRUE
 
 #include "util.h"
 

@@ -186,7 +186,7 @@ void aGen(Quad *currQuad){
         {
         case param:
         {
-
+            
             break;
         }
         case call:

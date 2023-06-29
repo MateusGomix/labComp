@@ -18,7 +18,7 @@
  * of the code file, and is used to print the
  * file name as a comment in the code file
  */
-void cGen(TreeNode *);
+void cGen(TreeNode *, TreeNode *);
 
 typedef enum {add,sub,mult,divOp,gt,gte,lt,lte,load,store,eq,halt,
               call,arg,lab,fun,end,aloc,param,gotolab,ret,iffalse,assign} Operacao;

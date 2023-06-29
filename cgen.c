@@ -125,7 +125,7 @@ Quad insereQuad(Operacao op, Endereco *end1, Endereco *end2, Endereco *end3)
 static int tmpOffset = 0;
 
 /* prototype for internal recursive code generator */
-void cGen(TreeNode *tree);
+void cGen(TreeNode *tree, TreeNode *parent);
 
 /* Procedure genStmt generates code at a statement node */
 static void genStmt(TreeNode *tree)
@@ -136,7 +136,7 @@ static void genStmt(TreeNode *tree)
    {
    case RetornoK:
       if(tree->child[0] != NULL){
-         cGen(tree->child[0]);
+         cGen(tree->child[0], tree);
          endAux1 = globalAux1;
       }
       insereQuad(ret, endAux1, endAux2, endAux3);
@@ -156,11 +156,11 @@ static void genStmt(TreeNode *tree)
       {Endereco *labelWhileStart = novoLabel(), *labelWhileEnd = novoLabel();
       endAux1 = labelWhileStart;
       insereQuad(lab, endAux1, endAux2, endAux3);
-      cGen(tree->child[0]);
+      cGen(tree->child[0], tree);
       endAux1 = globalAux1;
       endAux2 = labelWhileEnd;
       insereQuad(iffalse, endAux1, endAux2, endAux3);
-      cGen(tree->child[1]);
+      cGen(tree->child[1], tree);
       endAux1 = labelWhileStart;
       endAux2 = NULL;
       insereQuad(gotolab, endAux1, endAux2, endAux3);
@@ -170,11 +170,11 @@ static void genStmt(TreeNode *tree)
    case IfK:
       if(tree->child[1] != NULL){
          Endereco *labelElseStart = novoLabel(), *labelElseEnd = novoLabel();
-         cGen(tree->child[0]);
+         cGen(tree->child[0], tree);
          endAux1 = globalAux1;
          endAux2 = labelElseStart;
          insereQuad(iffalse, endAux1, endAux2, endAux3);
-         cGen(tree->child[1]);
+         cGen(tree->child[1], tree);
          if(tree->child[2] != NULL){
             endAux1 = labelElseEnd;
             endAux2 = NULL;
@@ -184,7 +184,7 @@ static void genStmt(TreeNode *tree)
          endAux2 = NULL;
          insereQuad(lab, endAux1, endAux2, endAux3);
          if(tree->child[2] != NULL){
-            cGen(tree->child[2]);
+            cGen(tree->child[2], tree);
             endAux1 = labelElseEnd;
             insereQuad(lab, endAux1, endAux2, endAux3);
          }
@@ -194,12 +194,12 @@ static void genStmt(TreeNode *tree)
    case RecebeK:
       endAux1 = criaEnd(String, tree->child[0]->attr.name, -1);
       //printf("aqui");
-      cGen(tree->child[1]);
+      cGen(tree->child[1], tree);
       //printf("aqui");
       endAux2 = globalAux1;
       endAux3 = globalAux2;
       if(tree->child[0]->vetor){
-         cGen(tree->child[0]->child[0]);
+         cGen(tree->child[0]->child[0], tree->child[0]);
          Endereco *tempIndex = novoTemp();
          insereQuad(mult, tempIndex, globalAux1, criaEnd(Const, NULL, INT_MEM_BYTES));
          endAux3 = endAux2;
@@ -221,17 +221,17 @@ static void genStmt(TreeNode *tree)
 } /* genStmt */
 
 /* Procedure genExp generates code at an expression node */
-static void genExp(TreeNode *tree)
+static void genExp(TreeNode *tree, TreeNode *parent)
 {
    Endereco *endAux1 = NULL, *endAux2 = NULL, *endAux3 = NULL;
    switch (tree->kind.exp)
    {
    case OpK:
       //printf("entrou no opk\n");
-      cGen(tree->child[0]);
+      cGen(tree->child[0], tree);
       //printf("opk\n");
       endAux2 = globalAux1;
-      cGen(tree->child[1]);
+      cGen(tree->child[1], tree);
       //printf("opk\n");
       endAux3 = globalAux1;
       endAux1 = novoTemp();
@@ -306,10 +306,18 @@ static void genExp(TreeNode *tree)
          /* FALTANDO E/OU DANDO ERRADO */
          if(tree->qtdArgumentos > 0){
             for(TreeNode *aux = tree->child[0]; aux != NULL; aux = aux->sibling){
-               genExp(aux);
+               genExp(aux, tree);
                endAux1 = globalAux1;
                insereQuad(param, endAux1, endAux2, endAux3);
             }
+            /*for(int qtdArgsAux = tree->qtdArgumentos; qtdArgsAux > 0; qtdArgsAux--){
+               TreeNode *aux = tree->child[0];
+               for(int subAux = 1; subAux < qtdArgsAux && aux != NULL; aux = aux->sibling, subAux++);
+               //printf("saiu do lacoooooo");
+               genExp(aux, tree);
+               endAux1 = globalAux1;
+               insereQuad(param, endAux1, endAux2, endAux3);
+            }*/
          }
          endAux1 = novoTemp();
          endAux2 = criaEnd(String, tree->attr.name, -1);
@@ -337,7 +345,10 @@ static void genExp(TreeNode *tree)
             }
             //printf("b");
             if(!tree->isArg) insereQuad(aloc, endAux1, endAux2, endAux3);
-            else insereQuad(arg, endAux1, endAux2, endAux3);
+            else {
+               if(parent->sibling != NULL) genExp(parent->sibling->child[0], parent->sibling);
+               insereQuad(arg, endAux1, endAux2, endAux3);
+            }
             //printf("b");
          }
          // mencao
@@ -354,7 +365,7 @@ static void genExp(TreeNode *tree)
             // vetor
             else{
                if(tree->child[0] != NULL){
-                  cGen(tree->child[0]);
+                  cGen(tree->child[0], tree);
                   Endereco *vetIndex = globalAux1;
                   endAux1 = novoTemp();
                   endAux2 = vetIndex;
@@ -395,8 +406,8 @@ static void genExp(TreeNode *tree)
          insereQuad(fun, endAux1, endAux2, NULL);
          // argumentos da funcao, caso existam
          if (tree->qtdArgumentos > 0)
-            cGen(tree->child[0]);
-         cGen(tree->child[1]);
+            cGen(tree->child[0], tree);
+         cGen(tree->child[1], tree);
          insereQuad(end, endAux2, NULL, NULL);
       }
       break; /* FuncK*/
@@ -409,7 +420,7 @@ static void genExp(TreeNode *tree)
 /* Procedure genEsp generates code at an especificator node */
 static void genEsp(TreeNode *tree)
 {
-   cGen(tree->child[0]);
+   cGen(tree->child[0], tree);
    //printf("aaaaaaaaaaa");
    //printf("%s", tree->child[0]->attr.name);
 } /* genEsp */
@@ -417,7 +428,7 @@ static void genEsp(TreeNode *tree)
 /* Procedure cGen recursively generates code by
  * tree traversal
  */
-void cGen(TreeNode *tree)
+void cGen(TreeNode *tree, TreeNode *parent)
 {
    // printQuads();
    if (tree != NULL)
@@ -428,7 +439,7 @@ void cGen(TreeNode *tree)
          genStmt(tree);
          break;
       case ExpK:
-         genExp(tree);
+         genExp(tree, parent);
          break;
       case EspK:
          //printf("espppppppp\n");
@@ -437,7 +448,11 @@ void cGen(TreeNode *tree)
       default:
          break;
       }
-      cGen(tree->sibling);
+      if (tree->nodekind = EspK && tree->child[0] != NULL && tree->child[0]->declaracao && tree->child[0]->isArg){
+
+      }
+      else
+      cGen(tree->sibling, parent);
    }
 }
 
@@ -564,7 +579,7 @@ rStruct* codeGen(TreeNode *syntaxTree)
 {
    /* generate code for Cmenos program */
    //printf("a\n");
-   cGen(syntaxTree);
+   cGen(syntaxTree, NULL);
    /* finish */
    //printf("b\n");
    insereQuad(halt, NULL, NULL, NULL);
