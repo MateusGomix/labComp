@@ -11,7 +11,7 @@
 #include "stdlib.h"
 
 #define STRING_TAM 10
-#define INT_MEM_BYTES 32
+#define INT_MEM_BYTES 1
 
 int isRegUsed[TOTAL_REGS] = {0};
 
@@ -347,7 +347,7 @@ static void genExp(TreeNode *tree, TreeNode *parent)
             if(!tree->isArg) insereQuad(aloc, endAux1, endAux2, endAux3);
             else {
                if(parent->sibling != NULL) genExp(parent->sibling->child[0], parent->sibling);
-               if (tree->vetor) endAux3 = criaEnd(String, "vet", -1); //indicar que esse param é um vetor
+               if (tree->vetor) endAux3 = criaEnd(String, "[]", -1); //indicar que esse param é um vetor
                insereQuad(arg, endAux1, endAux2, endAux3);
             }
             //printf("b");
@@ -479,6 +479,7 @@ void printQuad(Quad *aux){
          printf("PARAM,");
          break;
       case ret:
+         //for(int i = 0; i < TOTAL_REGS; i++) printf("%d", currQuad->next->regsUsados[i]);
          printf("RET,");
          break;
       case call:
