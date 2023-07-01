@@ -348,7 +348,7 @@ void aGen(Quad *currQuad){
               
               // localizando onde parou a pilha
               insereAssembly(tipoI, addiA, REG_PILHA, REG_PILHA, -1, 1);
-              insereAssembly(tipoI, subA, regAux1, REG_PILHA, regAux1, -1);
+              insereAssembly(tipoR, subA, regAux1, REG_PILHA, regAux1, -1);
 
               // guardando na memoria
               insereAssembly(tipoI, storeA, regAux1, regAux2, -1, 0);
@@ -662,6 +662,9 @@ void printAssembly(instA *aux){
    {
       switch (aux->opA)
       {
+      case outA:
+        printf("out");
+        break;
       case jrA:
         printf("jr");
         break;
@@ -779,7 +782,7 @@ void ajustaJumps(instA *raiz){
  * of the code file, and is used to print the
  * file name as a comment in the code file
  */
-void assemblyGen(rStruct *interAux)
+instA* assemblyGen(rStruct *interAux)
 {
     //pilhaDeRegs = criaPilhaReg();
     //printf("a\n");
@@ -796,5 +799,7 @@ void assemblyGen(rStruct *interAux)
     raizListaA->im = hashAux->lineno;
     printf("\tCODIGO ASSEMBLY COMPLETO E REFATORADO:\n");
     printAssembly(raizListaA);
-    printf("d\n");
+    //printf("d\n");
+
+    return raizListaA;
 }

@@ -14,6 +14,8 @@
 
 #define NO_ASSEMBLY FALSE
 
+#define NO_BINARY FALSE
+
 #include "util.h"
 
 #if !NO_ANALYZE
@@ -23,6 +25,9 @@
 #endif
 #if !NO_ASSEMBLY
 #include "agen.h"
+#if !NO_BINARY
+#include "bgen.h"
+#endif
 #endif
 #endif
 
@@ -44,6 +49,7 @@ int Error = FALSE;
 int main( int argc, char * argv[] )
 { TreeNode * syntaxTree;
 rStruct * quadAux;
+instA * assemblyAux;
   char pgm[120]; /* source code file name */
   if (argc != 2)
     { fprintf(stderr,"usage: %s <filename>\n",argv[0]);
@@ -92,14 +98,22 @@ rStruct * quadAux;
     
     quadAux = codeGen(syntaxTree);
   }
-#endif
 #if !NO_ASSEMBLY  
   if (! Error)
   {
     fprintf(listing,"\nCriacao do codigo assembly:\n");
     
-    assemblyGen(quadAux);
+    assemblyAux = assemblyGen(quadAux);
   }
+  #if !NO_BINARY  
+  if (! Error)
+  {
+    fprintf(listing,"\nCodigo binario:\n");
+    
+    binaryGen(assemblyAux);
+  }
+#endif
+#endif
 #endif
 #endif
 #endif
