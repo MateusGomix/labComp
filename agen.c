@@ -262,6 +262,8 @@ void desempilhaRegPilhaEspecial (Quad *currQuad, int regAux2){
   currQuad->regsUsados[regAux1] = 0;
 }
 
+int paramCount = 0;
+
 void aGen(Quad *currQuad){
   auxPrintA = NULL;
     if (currQuad != NULL){
@@ -271,6 +273,7 @@ void aGen(Quad *currQuad){
         case lab:
         {
           labelsVet[currQuad->end1->label] = currLineno;
+          auxPrintA = insereAssembly(tipoJ, nopA, -1, -1, -1, 0);
           break;
         }
         case ret:
@@ -286,9 +289,16 @@ void aGen(Quad *currQuad){
           desempilhaRegPilhaEspecial(currQuad, REG_PILHA);
 
           desempilha(currQuad, REG_RA);
-          desempilha(currQuad, REG_FRAME);
+          //desempilha(currQuad, REG_FRAME);
           int regRet = 0;
-          if (currQuad->end1 != NULL) regRet = currQuad->end1->regPos;
+          if (currQuad->end1 != NULL && currQuad->end1->regPos >= 0) {
+            regRet = currQuad->end1->regPos;
+          }
+          else if (currQuad->end1 != NULL && currQuad->end1->regPos < 0){
+            regRet = buscaRegLivreA(currQuad->regsUsados);
+            currQuad->regsUsados[regRet] = 1;
+            insereAssembly(tipoI, loadiA, -1, regRet, -1, currQuad->end1->conteudo.val);
+          }
           empilha(currQuad, regRet);
 
           insereAssembly(tipoR, jrA, -1, regAux1, -1, -1);
@@ -328,6 +338,7 @@ void aGen(Quad *currQuad){
         }
         case param:
         {
+            paramCount++;
             int regAux2 = currQuad->end1->regPos;
             instA *auxPrintA2;
             if(regAux2 < 0){
@@ -347,8 +358,9 @@ void aGen(Quad *currQuad){
               insereAssembly(tipoI, subiA, regAux1, regAux1, -1, 1);
               
               // localizando onde parou a pilha
-              insereAssembly(tipoI, addiA, REG_PILHA, REG_PILHA, -1, 1);
-              insereAssembly(tipoR, subA, regAux1, REG_PILHA, regAux1, -1);
+              insereAssembly(tipoI, subiA, regAux1, regAux1, -1, paramCount);
+              //insereAssembly(tipoI, addiA, REG_PILHA, REG_PILHA, -1, 1);
+              //insereAssembly(tipoR, subA, regAux1, REG_PILHA, regAux1, -1);
 
               // guardando na memoria
               insereAssembly(tipoI, storeA, regAux1, regAux2, -1, 0);
@@ -359,6 +371,7 @@ void aGen(Quad *currQuad){
         }
         case call:
         {
+            paramCount = 0;
             // call de input: do jeito que está agora, o input só funciona se for chamado ao igualar com uma variável
             if(strcmp(currQuad->end2->conteudo.nome, "input") == 0){
                 if (currQuad->next->op == store){
@@ -394,6 +407,8 @@ void aGen(Quad *currQuad){
             else{
               //for(int i = 0; i < TOTAL_REGS; i++) printf("%d ", currQuad->regsUsados[i]);
               //printf("\n");
+              // o registrador de retorno nao pode ser empilhado, por isso trocamos para zero aqui
+              //currQuad->regsUsados[currQuad->end1->regPos] = 0;
               for (int regAux2 = 0; regAux2 < TOTAL_REGS; regAux2++){
                 //printf("antes: ");for(int i = 0; i < TOTAL_REGS; i++) printf("%d ", currQuad->regsUsados[i]);
                 //printf("\n");
@@ -404,20 +419,26 @@ void aGen(Quad *currQuad){
                 //printf("depois: ");for(int i = 0; i < TOTAL_REGS; i++) printf("%d ", currQuad->regsUsados[i]);
                 //printf("\n");
               }
-              empilhaRegPilhaEspecial(currQuad, REG_PILHA);
-              empilha(currQuad, REG_FRAME);
+              //empilha(currQuad, REG_FRAME);
               empilha(currQuad, REG_RA);
+              empilhaRegPilhaEspecial(currQuad, REG_PILHA);
               insereAssembly(tipoI, loadiA, -1, REG_PILHA, -1, currQuad->end3->conteudo.val);
               BucketList auxHash = buscaHashEscopo(currQuad->end2->conteudo.nome);
               insereAssembly(tipoJ, jalA, -1, -1, -1, auxHash->lineno);
+              insereAssembly(tipoJ, nopA, -1, -1, -1, 0);
 
+              //int regRetCall = buscaRegLivreA(currQuad->regsUsados);
+              //currQuad->regsUsados[regRetCall] = 1;
               desempilha(currQuad, currQuad->end1->regPos); // retorno do call
 
               for (int regAux2 = TOTAL_REGS - 1; regAux2 >= 0; regAux2--){
                 if(currQuad->regsUsados[regAux2] == 1){
-                  desempilha(currQuad, regAux2);
+                  if (currQuad->end1->regPos == regAux2) insereAssembly(tipoI, subiA, REG_PILHA, REG_PILHA, -1, 1);
+                  else desempilha(currQuad, regAux2);
                 }
               }
+
+              //insereAssembly(tipoI, moveA, regRetCall, currQuad->end1->regPos, -1, 0);
 
             }
             break;
@@ -628,13 +649,18 @@ void aGen(Quad *currQuad){
                 currEscopo = escopo;
                 //printf(currEscopo);
                 insereHash(NULL, escopo, 0, 0);
+                auxPrintA = insereAssembly(tipoJ, nopA, -1, -1, -1, 0);
                 if (!strcmp(escopo, "main")) {
-                    auxPrintA = insereAssembly(tipoI, loadiA, -1, REG_FRAME, -1, 0);
+                    //auxPrintA = insereAssembly(tipoI, loadiA, -1, REG_FRAME, -1, 0);
+                    insereAssembly(tipoI, loadiA, -1, REG_FRAME, -1, 0);
                     insereAssembly(tipoI, addiA, REG_FRAME, REG_FRAME, -1, 1);
                     insereAssembly(tipoI, loadiA, -1, REG_PILHA, -1, 0);
                     insereAssembly(tipoI, loadiA, -1, REG_RA, -1, 0);
                 }
-                else auxPrintA = insereAssembly(tipoI, addiA, REG_FRAME, REG_FRAME, -1, 1);
+                else {
+                  //auxPrintA = insereAssembly(tipoI, addiA, REG_FRAME, REG_FRAME, -1, 1);
+                  insereAssembly(tipoI, addiA, REG_FRAME, REG_FRAME, -1, 1);
+                }
                 
                 //printf("saiu do fun\n");
                 break; /* end fun*/
@@ -662,6 +688,9 @@ void printAssembly(instA *aux){
    {
       switch (aux->opA)
       {
+      case nopA:
+        printf("nop");
+        break;
       case outA:
         printf("out");
         break;

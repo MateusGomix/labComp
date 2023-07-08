@@ -203,18 +203,18 @@ void insereBinario (TipoA tipoQuad, OperacaoA opB, int rs, int rt, int rd, int i
 
 void imprimeBinario(instB *currInstB){
   if (currInstB != NULL){
-    for(int i = 0; i < OP_BITS; i++) printf("%d", currInstB->opB[i]);printf(":");
+    for(int i = 0; i < OP_BITS; i++) printf("%d", currInstB->opB[i]);//printf(":");
 
     if (currInstB->tipoB == tipoR){
-      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rs[i]);printf(":");
-      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rt[i]);printf(":");
+      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rs[i]);//printf(":");
+      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rt[i]);//printf(":");
       for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rd[i]);
       printf("11111111111");
     }
     else if (currInstB->tipoB == tipoI){
-      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rs[i]);printf(":");
-      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rt[i]);printf(":");
-      for(int i = 0; i < IM_BITS; i++) printf("%d", currInstB->im[i]);
+      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rs[i]);//printf(":");
+      for(int i = 0; i < REG_BITS; i++) printf("%d", currInstB->rt[i]);//printf(":");
+      for(int i = IM_JUMP_BITS - IM_BITS; i < IM_JUMP_BITS; i++) printf("%d", currInstB->im[i]);
     }
     else if (currInstB->tipoB == tipoJ){
       for(int i = 0; i < IM_JUMP_BITS; i++) printf("%d", currInstB->im[i]);
