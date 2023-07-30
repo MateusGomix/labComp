@@ -27,7 +27,7 @@ char *currEscopo = "global";
 int labelsVet[TOTAL_LABELS];
 
 instA *raizListaA = NULL;
-
+/*
 TPilhaReg *pilhaDeRegs = NULL;
 
 TPilhaReg* criaPilhaReg(){
@@ -63,7 +63,7 @@ int* popPilhaReg(TPilhaReg *pilha){
   pilha->tam -= 1;
   return aux->regsEmpilhados;
 }
-
+*/
 /* SIZE is the size of the hash table */
 #define SIZE 211
 
@@ -630,13 +630,13 @@ void aGen(Quad *currQuad){
             if (currQuad->op == gt){
                 int anotherRegAux = regAux1;
                 regAux1 = regAux2;
-                regAux2 = regAux1;
+                regAux2 = anotherRegAux;
                 auxPrintA = insereAssembly(tipoR, sltA, regAux1, regAux2, currQuad->end1->regPos, -1);
             }
             if (currQuad->op == gte){
                 int anotherRegAux = regAux1;
                 regAux1 = regAux2;
-                regAux2 = regAux1;
+                regAux2 = anotherRegAux;
                 auxPrintA = insereAssembly(tipoI, addiA, regAux2, regAux2, -1, 1);
                 insereAssembly(tipoR, sltA, regAux1, regAux2, currQuad->end1->regPos, -1);
             }
@@ -648,7 +648,7 @@ void aGen(Quad *currQuad){
             currQuad->regsUsados[regAux3] = 1;
             insereAssembly(tipoI, loadiA, -1, regAux3, -1, 1);
 
-            insereAssembly(tipoI, beqA, currQuad->end1->regPos, regAux3, -1, currQuad->next->end2->label);
+            insereAssembly(tipoI, bneA, currQuad->end1->regPos, regAux3, -1, currQuad->next->end2->label);
 
             break;
         }

@@ -28,12 +28,12 @@ typedef struct VarListRec
  * it appears in the source code
  */
 typedef struct BucketListRec
-   { char * name;
-     int lineno;
-     //int calling; /* if calling function */
-     VarList vars;
-     struct BucketListRec * next;
-   } * BucketList;
+{ char * name;
+  int lineno;
+  //int calling; /* if calling function */
+  VarList vars;
+  struct BucketListRec * next;
+} * BucketList;
 
 typedef enum {tipoR,tipoI,tipoJ} TipoA;
 typedef enum {addA,addiA,subA,subiA,multA,multiA,divA,diviA,sltA,andA,andiA,orA,oriA,notA,
