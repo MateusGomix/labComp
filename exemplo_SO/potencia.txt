@@ -1,0 +1,25 @@
+int pot(int base, int expoente){
+	int i;
+	int result;
+	result = 1;
+	i = 0;
+	while(i < expoente){
+		result = result * base;
+		i = i + 1;
+	}
+
+	return result;
+}
+
+void main(void)
+{	
+	int a;
+	int b;
+	int result;
+	a = input();
+	b = input();
+	
+	result = pot(a, b);
+
+	output(result);
+}

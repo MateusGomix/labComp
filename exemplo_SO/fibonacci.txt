@@ -1,0 +1,16 @@
+/* Calcula a fibonacci de n */
+
+int fibo(int aux){
+    if (aux == 1) return 1;
+	if (aux == 0) return 1;
+    else return fibo(aux - 1) + fibo(aux - 2);
+}
+
+void main(void){	
+
+	int n;
+
+	n = input(); 
+
+	output(fibo(n));
+}

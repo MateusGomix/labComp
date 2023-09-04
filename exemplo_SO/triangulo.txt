@@ -1,0 +1,26 @@
+int ehTriangulo(int a, int b, int c){
+	if(a + b > c){
+		if(a + c > b){
+			if(b + c > a){
+				return 1;
+			}
+		}
+	}
+
+return 0;
+}
+
+void main(void)
+{	
+	int a;
+	int b;
+	int c;
+	int result;
+
+	a = input();
+	b = input();
+	c = input();
+	result = ehTriangulo(a,b,c);
+
+	output(result);
+}

@@ -1,0 +1,15 @@
+/* Calcula a n! */
+
+int fat(int aux){
+    if (aux == 1) return 1;
+    else return aux * fat(aux - 1);
+}
+
+void main(void){	
+
+	int n;
+
+	n = input(); 
+
+	output(fat(n));
+}

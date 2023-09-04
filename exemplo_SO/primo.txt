@@ -1,0 +1,24 @@
+int ehPrimo(int num){
+	int i;
+	int aux;
+	i = 2;
+	while (i < num){
+		aux = (num / i) * i - num;
+		if (aux == 0){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+void main(void)
+{	
+	int num;
+	int result;
+
+	num = input();
+	result = ehPrimo(num);
+
+	output(result);
+}
+

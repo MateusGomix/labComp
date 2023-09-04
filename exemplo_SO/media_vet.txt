@@ -1,0 +1,35 @@
+/* Um programa para calcular o mdc
+   segundo o algoritmo de Euclides. */
+
+void main(void)
+{	
+	int vet[5];
+	int soma;
+	int i;
+	int tam;
+	int x;
+	int med;
+
+	i = 0;
+	tam = 0;
+	tam = input();
+	
+	while (i < tam){
+		x = input();
+		vet[i] = x;
+		i = i + 1;
+	}
+
+	i = 0;
+	soma = 0;
+
+	while (i < tam){
+		soma = vet[i] + soma;
+		i = i + 1;
+	}
+
+	med = soma / tam;
+
+	output(med);
+}
+
